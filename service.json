@@ -1,0 +1,30 @@
+{
+  "org": "$HZN_ORG_ID",
+  "label": "$SERVICE_NAME for $ARCH",
+  "url": "$SERVICE_NAME",
+  "version": "$SERVICE_VERSION",
+  "arch": "$ARCH",
+  "public": true,
+  "sharable": "singleton",
+  "requiredServices": [
+    {
+      "org": "$HZN_ORG_ID",
+      "url": "$YOUR_SERVICE_NAME",
+      "version": "$YOUR_SERVICE_VERSION",
+      "arch": "$ARCH"
+    }
+  ],
+  "userInput": [
+    { "name": "MMS_HELPER_OBJECT_TYPE", "label": "", "type": "string", "defaultValue": "$YOUR_OBJECT_TYPE" },
+    { "name": "MMS_HELPER_SHARED_DIR", "label": "", "type": "string", "defaultValue": "/shared_dir" }
+  ],
+  "deployment": {
+    "services": {
+      "$SERVICE_NAME": {
+        "image": "$SERVICE_CONTAINER",
+        "binds": ["$YOUR_SHARED_DIR:/shared_dir:rw"]
+      }
+    }
+  }
+}
+

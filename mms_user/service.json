@@ -1,0 +1,20 @@
+{
+  "org": "$HZN_ORG_ID",
+  "label": "",
+  "url": "mms-user",
+  "version": "1.0.0",
+  "arch": "amd64",
+  "public": true,
+  "sharable": "singleton",
+  "requiredServices": [],
+  "userInput": [],
+  "deployment": {
+    "services": {
+      "mms-user": {
+        "image": "ibmosquito/mms-user:1.0.0",
+        "binds": ["/home/gdarling/objects:/shared_dir:ro"]
+      }
+    }
+  }
+}
+

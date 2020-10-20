@@ -11,69 +11,86 @@ import threading
 import time
 import base64
 
-# Configuration constants
-FLASK_BIND_ADDRESS = '0.0.0.0'
-FLASK_PORT = 2222
-ESS_COMMAND = '...'
+# Configuration from the process environment
+def get_from_env(v, d):
+  if v in os.environ and '' != os.environ[v]:
+    return os.environ[v]
+  else:
+    return d
+HZN_ESS_AUTH = get_from_env('HZN_ESS_AUTH', '/ess-auth/auth.json')
+HZN_ESS_CERT = get_from_env('HZN_ESS_CERT', '/ess-auth/cert.pem')
+HZN_ESS_API_ADDRESS = get_from_env('HZN_ESS_API_ADDRESS', '/var/run/horizon/essapi.sock')
+MMS_HELPER_OBJECT_TYPE = get_from_env('MMS_HELPER_OBJECT_TYPE', 'unknown')
+MMS_HELPER_VOLUME = get_from_env('MMS_HELPER_VOLUME', '/shared_dir')
 
-# ESS credentials (must be provided via "/config" REST POST)
-ESS_CREDS = None
-
-# Globals for the cached JSON data (latest from the ESS)
-last_ess = None
+# Load the ESS credentials (user/token)
+with open(HZN_ESS_AUTH) as creds_file:
+  creds = json.load(creds_file)
+HZN_ESS_USER = creds['id']
+HZN_ESS_TOKEN = creds['token']
 
 # Cheap debug
+DEBUG = False
 def debug(s):
-  # Comment out the line below to control debug output
-  print(s)
-  pass
+  if DEBUG:
+    print(s)
+
+# Cheap logging
+INFO = False
+WARNING = True
+ERROR = True
+def log(t, s):
+  if (INFO and t == 'info') or (WARNING and t == 'WARNING') or (ERROR and t == 'ERROR'):
+    print("%s: %s" % (t, s))
+
+def main():
+  LOOP_DELAY_SEC = 3
+  debug('\nMonitoring ESS...')
+  debug('  user=%s' % HZN_ESS_USER)
+  debug('  token=%s' % HZN_ESS_TOKEN)
+  debug('  cacert=%s' % HZN_ESS_CERT)
+  debug('  socket=%s' % HZN_ESS_API_ADDRESS)
+  debug('  object_type=%s' % MMS_HELPER_OBJECT_TYPE)
+  debug('  shared_dir=%s' % MMS_HELPER_VOLUME)
+
+  ESS_OBJECT_LIST_BASE = 'curl -sSL -u %s:%s --cacert %s --unix-socket %s https://localhost/api/v1/objects/%s'
+  ESS_REDIRECT_BASE = 'curl -sSL -u %s:%s --cacert %s --unix-socket %s https://localhost/api/v1/objects/%s/%s/data -o %s/%s'
+  ESS_MARK_RECEIVED_BASE = 'curl -sSL -X PUT -u %s:%s --cacert %s --unix-socket %s https://localhost/api/v1/objects/%s/%s/received'
+  while True:
+    get_objects = ESS_OBJECT_LIST_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE)
+    try:
+      raw = subprocess.check_output(get_objects, shell=True)
+      output = raw.decode("utf-8") 
+      debug('\n\nReceived from ESS:\n')
+      debug(output)
+      j = json.loads(output)
+      id = j[-1]['objectID']
+      deleted = j[-1]['deleted']
+      if not deleted:
+        tempfile = '.' + id
+        redirect_command = ESS_REDIRECT_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE, id, MMS_HELPER_VOLUME, tempfile)
+        try:
+          subprocess.run(redirect_command, shell=True, check=True)
+          debug('ESS object file copy was successful.')
+          try:
+            rename_command = '/bin/mv %s/%s %s/%s' % (MMS_HELPER_VOLUME, tempfile, MMS_HELPER_VOLUME, id)
+            subprocess.run(rename_command, shell=True, check=True)
+            debug('File rename was successful.')
+            mark_received_command = ESS_MARK_RECEIVED_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE, id)
+            try:
+              log("info", mark_received_command)
+              subprocess.run(mark_received_command, shell=True, check=True)
+              debug('ESS object received command was successful.')
+            except:
+              log("ERROR", mark_received_command)
+          except:
+            log("ERROR", rename_command)
+        except:
+          log("ERROR", redirect_command)
+    except:
+      log("info", get_objects)
+    debug('Sleeping for ' + str(LOOP_DELAY_SEC) + ' seconds...')
+    time.sleep(LOOP_DELAY_SEC)
 
 if __name__ == '__main__':
-
-  from io import BytesIO
-  from flask import Flask
-  from flask import send_file
-  rest_api = Flask('MMS Helper')                             
-  rest_api.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
-  # Loop forever collecting info from the ESS
-  class EssThread(threading.Thread):
-    def run(self):
-      global last_cam
-      debug('\nESS monitor thread started!')
-      ESS_COMMAND = '...'
-      T = 5
-      while True:
-        if ESS_CREDS:
-          last_ess = subprocess.check_output(ESS_COMMAND, shell=True)
-          #if <auth error>:
-          #  # Creds failed, so delete them
-          #  ESS_CREDS = None
-          debug('\n\nMessage received from ESS...\n')
-          debug(last_ess)
-        debug('\nSleeping for ' + str(T) + ' seconds...\n')
-        time.sleep(T)
-
-  @rest_api.route('/config')
-  def get_yolo_image():
-    debug('\nREST request: "/config"...')
-    # ...
-    # ESS_CREDS = ...
-    # ...
-    return ''
-
-  # Prevent caching everywhere
-  @rest_api.after_request
-  def add_header(r):
-    r.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    r.headers['Pragma'] = 'no-cache'
-    r.headers['Expires'] = '0'
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
-  # Main program (instantiates and starts watcher threads and then web server)
-  ess_listener = EssThread()
-  ess_listener.start()
-  rest_api.run(host=FLASK_BIND_ADDRESS, port=FLASK_PORT)
-
-
+  main()
