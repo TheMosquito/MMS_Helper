@@ -4,12 +4,12 @@ Some glue code to simplify the use of the Open Horizon Model Management System.
 
 1. Begin by installing the Open-Horizon Agent, and configuring your creds:
 
-``` bash
-   $ agent-install.sh
-   $ export HZN_ORG_ID=...
-   $ export HZN_EXCHANGE_USER_AUTH=...
-   $ hzn key create ...
-```
+     ``` bash
+        $ agent-install.sh
+        $ export HZN_ORG_ID=...
+        $ export HZN_EXCHANGE_USER_AUTH=...
+        $ hzn key create ...
+     ```
 
 2. Edit the Makefile variables below as described:
 
@@ -38,31 +38,27 @@ Some glue code to simplify the use of the Open Horizon Model Management System.
 
 3. Build, push and publish this "mms-helper" service:
 
-``` bash
-   $ make build
-   $ docker login -u ...
-   $ make push
-   $ make publish-service
-```
+     ``` bash
+        $ make build
+        $ docker login -u ...
+        $ make push
+        $ make publish-service
+     ```
 
 4. Publish a pattern or business policy to deploy this Service. E.g.:
 
-``` bash
-   $ make publish-pattern
-```
+     ``` bash
+        $ make publish-pattern
+     ```
 
 5. Register your edge nodes using a pattern or node policy, e.g.:
 
-``` bash
-   $ make register-pattern
-```
+     ``` bash
+        $ make register-pattern
+     ```
 
-6. Start using the `hzn mms object publish` command to publish objects of the specified `YOUR_OBJECT_TYPE`. They will show up up in your `/CONTAINER_DIR` within your container, named using the object IDs you published them with, If you used the pattern above, and set the `OPTIONAL_...` variables, then simply:
+6. Start using the `hzn mms object publish` command to publish objects of the specified `YOUR_OBJECT_TYPE`. They will show up up in your `/CONTAINER_DIR` within your container, named using the object IDs you published them with, If you used the pattern above, and set the `OPTIONAL_...` variables, then you can use the command below to send the example file object to your dependendency Service running on every node registered with the example pattern:
 
-``` bash
-   $ make publish-object
-```
-
- to send the example file object to your dependendency Service running on
- every node registered with the example pattern.
-
+     ``` bash
+         $ make publish-object
+     ```
