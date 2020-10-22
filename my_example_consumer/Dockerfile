@@ -2,4 +2,4 @@ FROM alpine:latest
 
 COPY *.sh /
 WORKDIR /
-CMD /mms_user.sh
+CMD /my_example_consumer.sh

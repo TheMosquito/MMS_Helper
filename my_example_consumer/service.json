@@ -1,18 +1,18 @@
 {
   "org": "$HZN_ORG_ID",
   "label": "",
-  "url": "mms-user",
+  "url": "my_example_consumer",
   "version": "1.0.0",
   "arch": "amd64",
-  "public": true,
+  "public": false,
   "sharable": "singleton",
   "requiredServices": [],
   "userInput": [],
   "deployment": {
     "services": {
-      "mms-user": {
-        "image": "ibmosquito/mms-user:1.0.0",
-        "binds": ["/home/gdarling/objects:/shared_dir:ro"]
+      "my_example_consumer": {
+        "image": "ibmosquito/my_example_consumer:1.0.0",
+        "binds": ["my_mms_shared_volume:/shared_dir:ro"]
       }
     }
   }
