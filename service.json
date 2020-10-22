@@ -16,13 +16,13 @@
   ],
   "userInput": [
     { "name": "MMS_HELPER_OBJECT_TYPE", "label": "", "type": "string", "defaultValue": "$YOUR_OBJECT_TYPE" },
-    { "name": "MMS_HELPER_SHARED_DIR", "label": "", "type": "string", "defaultValue": "/shared_dir" }
+    { "name": "MMS_HELPER_VOLUME_MOUNT", "label": "", "type": "string", "defaultValue": "/shared_dir" }
   ],
   "deployment": {
     "services": {
       "$SERVICE_NAME": {
         "image": "$SERVICE_CONTAINER",
-        "binds": ["$YOUR_SHARED_DIR:/shared_dir:rw"]
+        "binds": ["$MMS_HELPER_SHARED_VOLUME:/shared_dir:rw"]
       }
     }
   }

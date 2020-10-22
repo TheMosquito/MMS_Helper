@@ -12,7 +12,7 @@
     "services": {
       "my_example_consumer": {
         "image": "ibmosquito/my_example_consumer:1.0.0",
-        "binds": ["my_mms_shared_volume:/shared_dir:ro"]
+        "binds": ["my_mms_helper_shared_volume:/shared_dir:rw"]
       }
     }
   }

@@ -42,7 +42,7 @@
 # Please edit these appropriately (as described above)
 YOUR_SERVICE_NAME:=my_example_consumer
 YOUR_SERVICE_VERSION:=1.0.0
-MMS_HELPER_SHARED_VOLUME:=my_mms_helper_volume
+MMS_HELPER_SHARED_VOLUME:=my_mms_helper_shared_volume
 YOUR_OBJECT_TYPE:=my_object_type
 YOUR_DOCKERHUB_ID:=ibmosquito
 
@@ -58,7 +58,7 @@ ARCH:=amd64
 # Note that service and container may have differen names and versions.
 MMS_HELPER_SERVICE_NAME:=mms-helper
 MMS_HELPER_SERVICE_VERSION:=1.0.0
-MMS_HELPER_CONTAINER:=$(YOUR_DOCKERHUB_ID)/mms-helper/1.0.0
+MMS_HELPER_CONTAINER:=$(YOUR_DOCKERHUB_ID)/mms-helper:1.0.0
 # For DockerHub, leave the variable below as it is (empty).
 # For secure registries set it using:  -r "registry.wherever.com:myid:mypw"`
 MMS_HELPER_CONTAINER_CREDS:=

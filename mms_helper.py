@@ -20,7 +20,7 @@ def get_from_env(v, d):
 HZN_ESS_AUTH = get_from_env('HZN_ESS_AUTH', '/ess-auth/auth.json')
 HZN_ESS_CERT = get_from_env('HZN_ESS_CERT', '/ess-auth/cert.pem')
 HZN_ESS_API_ADDRESS = get_from_env('HZN_ESS_API_ADDRESS', '/var/run/horizon/essapi.sock')
-MMS_HELPER_SHARED_VOLUME = get_from_env('MMS_HELPER_SHARED_VOLUME', '/shared_dir')
+MMS_HELPER_VOLUME_MOUNT = get_from_env('MMS_HELPER_VOLUME_MOUNT', '/shared_dir')
 MMS_HELPER_OBJECT_TYPE = get_from_env('MMS_HELPER_OBJECT_TYPE', 'unknown')
 
 # Load the ESS credentials (user/token)
@@ -51,7 +51,7 @@ def main():
   debug('  cacert=%s' % HZN_ESS_CERT)
   debug('  socket=%s' % HZN_ESS_API_ADDRESS)
   debug('  object_type=%s' % MMS_HELPER_OBJECT_TYPE)
-  debug('  shared_dir=%s' % MMS_HELPER_SHARED_VOLUME)
+  debug('  shared_dir=%s' % MMS_HELPER_VOLUME_MOUNT)
 
   ESS_OBJECT_LIST_BASE = 'curl -sSL -u %s:%s --cacert %s --unix-socket %s https://localhost/api/v1/objects/%s'
   ESS_REDIRECT_BASE = 'curl -sSL -u %s:%s --cacert %s --unix-socket %s https://localhost/api/v1/objects/%s/%s/data -o %s/%s'
@@ -68,12 +68,12 @@ def main():
       deleted = j[-1]['deleted']
       if not deleted:
         tempfile = '.' + id
-        redirect_command = ESS_REDIRECT_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE, id, MMS_HELPER_SHARED_VOLUME, tempfile)
+        redirect_command = ESS_REDIRECT_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE, id, MMS_HELPER_VOLUME_MOUNT, tempfile)
         try:
           subprocess.run(redirect_command, shell=True, check=True)
           debug('ESS object file copy was successful.')
           try:
-            rename_command = '/bin/mv %s/%s %s/%s' % (MMS_HELPER_SHARED_VOLUME, tempfile, MMS_HELPER_SHARED_VOLUME, id)
+            rename_command = '/bin/mv %s/%s %s/%s' % (MMS_HELPER_VOLUME_MOUNT, tempfile, MMS_HELPER_VOLUME_MOUNT, id)
             subprocess.run(rename_command, shell=True, check=True)
             debug('File rename was successful.')
             mark_received_command = ESS_MARK_RECEIVED_BASE % (HZN_ESS_USER, HZN_ESS_TOKEN, HZN_ESS_CERT, HZN_ESS_API_ADDRESS, MMS_HELPER_OBJECT_TYPE, id)
