@@ -26,9 +26,9 @@ Some glue code to simplify the use of the Open Horizon Model Management System.
      you Service defiinition's **deployment string**, use something to the binding
      shown below. Please see the [deployment string documentation](https://github.com/open-horizon/anax/blob/master/docs/deployment_string.md) for more details.
      
-``` bash
+     ``` bash
        "binds": ["$MMS_HELPER_SHARED_VOLUME:/CONTAINER_DIR:ro"]
-```
+     ```
 
    `YOUR_OBJECT_TYPE` - the object type name for MMS_Helper to monitor
 
