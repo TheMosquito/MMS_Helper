@@ -17,16 +17,18 @@ Some glue code to simplify the use of the Open Horizon Model Management System.
    `YOUR_SERVICE_VERSION` - the version of your dependent MMS consuming Service
 
    `MMS_HELPER_SHARED_VOLUME`  - a Docker volume for these conainers to share.
-     Note: you need to mount this in your consuming Service, e.g., in your
-     Service defiinition's deployment string, use something like this:
 
+     Note that if you use a host **directory** here instead of a **volume name**,
+     then you need to ensure the directory is writeable by the contaiiner
+     processes (which run under a different user ID).
+   
+     Note also that you need to mount this in your consuming Service, e.g., in
+     you Service defiinition's **deployment string**, use something to the binding
+     shown below. Please see the [deployment string documentation](https://github.com/open-horizon/anax/blob/master/docs/deployment_string.md) for more details.
+     
 ``` bash
        "binds": ["$MMS_HELPER_SHARED_VOLUME:/CONTAINER_DIR:ro"]
 ```
-
-     Note also that if you use a host directory here instead of a volume name,
-     then you need to ensure the directory is writeable by the contaiiner
-     processes (which run under a different user ID).
 
    `YOUR_OBJECT_TYPE` - the object type name for MMS_Helper to monitor
 
