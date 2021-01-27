@@ -5,5 +5,5 @@ RUN apt update && apt install -y python3 python3-pip curl
 COPY ./mms_helper.py /
 WORKDIR /
 
-CMD python3 mms_helper.py
+CMD ["python3", "-u", "mms_helper.py"]
 
