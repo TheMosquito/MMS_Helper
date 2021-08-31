@@ -51,14 +51,14 @@ YOUR_DOCKERHUB_ID:=ibmosquito
 OPTIONAL_OBJECT_ID:=my_object_0
 OPTIONAL_OBJECT_FILE:=my_object_0
 
-# This example is only for x86 (you need to change a few things to switch this)
-ARCH:=amd64
+# The "helper" utility is useful for things like this so I included it.
+ARCH:=`./helper -a`
 
 # Variables for MMS_Helper container/service/pattern (optionally edit these)
 # Note that service and container may have differen names and versions.
 MMS_HELPER_SERVICE_NAME:=mms-helper
 MMS_HELPER_SERVICE_VERSION:=1.0.0
-MMS_HELPER_CONTAINER:=$(YOUR_DOCKERHUB_ID)/mms-helper:1.0.0
+MMS_HELPER_CONTAINER:=$(YOUR_DOCKERHUB_ID)/mms-helper_$(ARCH):1.0.0
 # For DockerHub, leave the variable below as it is (empty).
 # For secure registries set it using:  -r "registry.wherever.com:myid:mypw"`
 MMS_HELPER_CONTAINER_CREDS:=

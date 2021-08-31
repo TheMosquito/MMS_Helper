@@ -2,6 +2,8 @@
 
 This project is glue code that I use for the Open Horizon Model Management System (MMS). I wrote this because I have difficulty following the [official Open Horizon documentation](https://github.com/open-horizon/examples/tree/master/edge/services/helloMMS) for the MMS. I hope you will find this helpful too, but if you run into troubles please go to the official documentation and follow the procedures there.
 
+NOTE: Only amd64 (x86/64) and arm64 architectures are currently supported, but it should be easy to build this for arrm32 too (I just haven't had a reason to try on a little machine like that, yet).
+
 1. Begin by installing the Open-Horizon Agent, and configuring your creds:
 
      ``` bash
